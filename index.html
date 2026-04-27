@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<title>QR Code</title>
+
+<style>
+html { font-size: 13px; }
+
+body {
+  margin: 0;
+  font-family: "Noto Sans", sans-serif;
+  background: url("IMG_8622.jpeg") no-repeat center/cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+/* 🔥 KHUNG CHUẨN */
+.container {
+  width: 100%;
+  max-width: 300px; /* ↓ GIẢM NỮA cho giống ảnh */
+  padding-top: 20px;
+  text-align: center;
+}
+
+/* TITLE */
+.title {
+  color: #f4e4c0;
+  font-size: 1.1rem;
+  margin: 18px 0 14px;
+}
+
+/* CARD */
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* HEADER */
+.card-header {
+  background: #e9bb3a;
+  color: #fff;
+  padding: 10px 8px; /* ↓ mỏng hơn */
+  font-size: 0.85rem;
+  position: relative;
+}
+
+/* CHẤM 2 BÊN */
+.card-header::before,
+.card-header::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #3b3d54;
+  border-radius: 50%;
+  bottom: -5px;
+}
+.card-header::before { left: -5px; }
+.card-header::after { right: -5px; }
+
+/* BODY */
+.card-body {
+  background: #efefef;
+  padding: 10px 8px 12px; /* ↓ mỏng chuẩn */
+}
+
+/* TIME */
+.time {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* 🔥 QR CHUẨN NHẤT */
+.qr {
+  width: 100%;
+  max-width: 200px; /* ↓ QUAN TRỌNG */
+  aspect-ratio: 1/1;
+  display: block;
+  margin: 0 auto;
+}
+
+/* REFRESH */
+.refresh {
+  color: #888;
+  font-size: 0.75rem;
+  margin: 6px 0;
+}
+
+/* STATUS */
+.status {
+  color: #23c15a;
+  font-size: 1.1rem;
+  margin-top: 4px;
+}
+
+.countdown {
+  color: #23c15a;
+  font-size: 0.95rem;
+}
+
+/* FOOTER */
+.footer {
+  color: #f4e4c0;
+  font-size: 0.8rem;
+  margin-top: 16px;
+  line-height: 1.5;
+  padding: 0 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="title">V25090035 (Kaelen Nguyen)</div>
+
+  <div class="card">
+    
+    <div class="card-header">
+      将二维码对准扫描器刷码出场
+    </div>
+
+    <div class="card-body">
+      
+      <div class="time" id="time"></div>
+
+      <img src="ewm.gif" class="qr" id="qr">
+
+      <div class="refresh" id="refresh">刷新二维码</div>
+
+      <div class="status">已生效</div>
+      <div class="countdown" id="countdown">00:00</div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    尊敬的员工您好，您已进入企业涉密区域，出于企业安全考虑，您的手机摄像头将被禁止拍摄，感谢您的配合。
+  </div>
+
+</div>
+
+<script>
+/* TIME REALTIME */
+function updateTime() {
+  const n = new Date();
+  document.getElementById("time").innerText =
+    `${n.getFullYear()}-${n.getMonth()+1}-${n.getDate()} ` +
+    `${String(n.getHours()).padStart(2,'0')}:` +
+    `${String(n.getMinutes()).padStart(2,'0')}:` +
+    `${String(n.getSeconds()).padStart(2,'0')}`;
+}
+setInterval(updateTime,1000);
+updateTime();
+
+/* COUNTDOWN */
+let defaultTime = 48*60+27;
+let seconds = defaultTime;
+
+setInterval(()=>{
+  let m = Math.floor(seconds/60);
+  let s = seconds%60;
+  document.getElementById("countdown").innerText =
+    `${m}:${String(s).padStart(2,'0')}`;
+  if(seconds>0) seconds--;
+},1000);
+
+/* CLICK 5 RESET */
+let c=0;
+document.getElementById("refresh").onclick=()=>{
+  c++;
+  if(c>=5){
+    seconds = defaultTime;
+    document.getElementById("qr").src = "ewm.gif?t="+Date.now();
+    c=0;
+  }
+}
+</script>
+
+</body>
+</html>
