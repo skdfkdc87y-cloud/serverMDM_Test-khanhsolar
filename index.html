@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #2c2f45 0%, #1f2235 100%);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* container */
+.container {
+    width: 100%;
+    max-width: 390px;
+    padding-top: 70px;
+    text-align: center;
+}
+
+/* tên */
+.user-info {
+    font-size: 1.15rem;
+    color: #e6d3a3;
+    margin-bottom: 26px;
+    font-weight: 500;
+}
+
+/* card */
+.qr-card {
+    background: #fff;
+    border-radius: 14px;
+    width: 82%;
+    margin: 0 auto;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.55);
+    position: relative;
+    overflow: hidden;
+}
+
+/* header */
+.qr-header {
+    background: #f3c23c;
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 20px 14px;
+}
+
+/* notch */
+.notch {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #2c2f45;
+    border-radius: 50%;
+    top: 56px;
+}
+.notch-left { left: -7px; }
+.notch-right { right: -7px; }
+
+/* body */
+.qr-body {
+    padding: 18px 10px 26px;
+}
+
+#current-time {
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    color: #222;
+}
+
+/* QR */
+.qr-image-container {
+    width: 88%;
+    margin: 0 auto;
+}
+
+.ewm {
+    width: 100%;
+}
+
+/* text */
+.refresh-text {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 14px 0 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.status-active {
+    color: #28c76f;
+    font-size: 1.35rem;
+    font-weight: bold;
+    animation: breath 2.5s infinite;
+}
+
+#timer-up {
+    color: #28c76f;
+    font-size: 1rem;
+    margin-top: 3px;
+}
+
+/* hiệu ứng */
+@keyframes breath {
+    0%,100% {opacity:0.7;}
+    50% {opacity:1;}
+}
+
+/* footer */
+.footer-note {
+    margin: 40px 20px;
+    font-size: 0.83rem;
+    line-height: 1.7;
+    color: #e6d3a3;
+    text-align: left;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="user-info">V25090035(Kaelen Nguyen)</div>
+
+    <div class="qr-card">
+        <div class="qr-header">
+            将二维码对准扫描器刷码出场
+        </div>
+
+        <div class="notch notch-left"></div>
+        <div class="notch notch-right"></div>
+
+        <div class="qr-body">
+            <div id="current-time"></div>
+
+            <div class="qr-image-container">
+                <img src="./ewm.gif" class="ewm"
+                onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=KaelenNguyen'">
+            </div>
+
+            <div class="refresh-text" id="refresh-btn">刷新二维码</div>
+            <div class="status-active">已生效</div>
+            <div id="timer-up">00:00</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        尊敬的员工您好，您已进入企业涉密区域，出于企业安全考虑，您的手机摄像头将被禁止拍摄，感谢您的配合。
+    </div>
+</div>
+
+<script>
+// ===== CLOCK =====
+function updateClock() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth()+1).padStart(2,'0');
+    const d = String(now.getDate()).padStart(2,'0');
+    const h = String(now.getHours()).padStart(2,'0');
+    const mi = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById("current-time").innerText =
+        `${y}-${m}-${d} ${h}:${mi}:${s}`;
+}
+
+// ===== TIMER =====
+let start = localStorage.getItem("t");
+if(!start){
+    start = Date.now();
+    localStorage.setItem("t", start);
+}else{
+    start = parseInt(start);
+}
+
+function updateTimer(){
+    let now = Date.now();
+    let diff = Math.floor((now - start)/1000);
+
+    if(diff >= 43200){
+        start = Date.now();
+        localStorage.setItem("t", start);
+        diff = 0;
+    }
+
+    let h = Math.floor(diff/3600);
+    let m = Math.floor((diff%3600)/60);
+    let s = diff%60;
+
+    let txt = h>0
+        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+        : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+    document.getElementById("timer-up").innerText = txt;
+}
+
+// ===== TAP 5 LẦN RESET =====
+let tapCount = 0;
+let tapTimer = null;
+
+const refreshBtn = document.getElementById("refresh-btn");
+
+refreshBtn.addEventListener("click", () => {
+    tapCount++;
+
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => {
+        tapCount = 0;
+    }, 1500);
+
+    if (tapCount >= 5) {
+        start = Date.now();
+        localStorage.setItem("t", start);
+        tapCount = 0;
+
+        document.getElementById("timer-up").innerText = "00:00";
+    }
+});
+
+// chạy
+setInterval(updateClock,1000);
+setInterval(updateTimer,1000);
+updateClock();
+updateTimer();
+</script>
+
+</body>
+</html>
