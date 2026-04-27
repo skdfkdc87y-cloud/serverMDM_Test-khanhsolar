@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- PWA iPhone -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
+
+<title>QR Code</title>
+
+<style>
+html { font-size: 13px; }
+
+body {
+  margin: 0;
+  font-family: "Noto Sans", sans-serif;
+  background: url("IMG_8622.jpeg") no-repeat center/cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+/* KHUNG */
+.container {
+  width: 100%;
+  max-width: 340px;
+  padding: 16px 12px;
+  text-align: center;
+}
+
+/* TITLE */
+.title {
+  color: #f4e4c0;
+  font-size: 1.2rem;
+  margin: 18px 0;
+}
+
+/* CARD */
+.card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* HEADER */
+.card-header {
+  background: #f3c23c;
+  color: #fff;
+  padding: 12px;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+/* CHẤM */
+.card-header::before,
+.card-header::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #3b3d54;
+  border-radius: 50%;
+  bottom: -6px;
+}
+.card-header::before { left: -6px; }
+.card-header::after { right: -6px; }
+
+/* BODY */
+.card-body {
+  background: #f2f2f2;
+  padding: 12px;
+}
+
+/* TIME */
+.time {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+/* QR GIF */
+.qr {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1/1;
+  margin: 0 auto;
+  display: block;
+}
+
+/* REFRESH */
+.refresh {
+  color: #777;
+  font-size: 0.8rem;
+  margin: 8px 0;
+}
+
+/* STATUS */
+.status {
+  color: #25c25a;
+  font-size: 1.2rem;
+}
+
+.countdown {
+  color: #1db954;
+  font-size: 1rem;
+}
+
+/* FOOTER */
+.footer {
+  color: #f4e4c0;
+  font-size: 0.85rem;
+  margin-top: 18px;
+  line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="title">V25090035 (Kaelen Nguyen)</div>
+
+  <div class="card">
+    
+    <div class="card-header">
+      将二维码对准扫描器刷码出场
+    </div>
+
+    <div class="card-body">
+      
+      <div class="time" id="time"></div>
+
+      <!-- QR GIF -->
+      <img src="ewm.gif" class="qr" id="qr">
+
+      <div class="refresh" id="refresh">刷新二维码</div>
+
+      <div class="status">已生效</div>
+      <div class="countdown" id="countdown">48:29</div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    尊敬的员工您好，您已进入企业涉密区域，出于企业安全考虑，您的手机摄像头将被禁止拍摄，感谢您的配合。
+  </div>
+
+</div>
+
+<script>
+/* ===== GIỜ REALTIME ===== */
+function updateTime() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  const h = String(now.getHours()).padStart(2,'0');
+  const mi = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+
+  document.getElementById("time").innerText =
+    `${y}-${m}-${d} ${h}:${mi}:${s}`;
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+/* ===== COUNTDOWN ===== */
+let defaultTime = 48 * 60 + 29;
+let seconds = defaultTime;
+
+function updateCountdown() {
+  let m = Math.floor(seconds / 60);
+  let s = seconds % 60;
+
+  document.getElementById("countdown").innerText =
+    `${m}:${String(s).padStart(2,'0')}`;
+
+  if (seconds > 0) seconds--;
+}
+setInterval(updateCountdown, 1000);
+
+/* ===== CLICK 5 LẦN RESET ===== */
+let clickCount = 0;
+
+document.getElementById("refresh").addEventListener("click", () => {
+  clickCount++;
+
+  if (clickCount >= 5) {
+    seconds = defaultTime;
+
+    // reload QR (fake refresh)
+    let qr = document.getElementById("qr");
+    qr.src = "ewm.gif?t=" + new Date().getTime();
+
+    clickCount = 0;
+  }
+});
+</script>
+
+</body>
+</html>
